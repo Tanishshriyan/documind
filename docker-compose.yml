@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-documind}"
+      POSTGRES_USER: "${POSTGRES_USER:-documind}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-documind}"
+    ports:
+      - "5432:5432"
+    volumes:
+      - documind_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: "${DATABASE_URL:-postgresql+psycopg://documind:documind@postgres:5432/documind}"
+      STORAGE_DIR: "${STORAGE_DIR:-/app/storage}"
+      DOCUMENT_STORAGE_BACKEND: "${DOCUMENT_STORAGE_BACKEND:-local}"
+      DOCUMENT_STORAGE_PATH: "${DOCUMENT_STORAGE_PATH:-/app/storage/documents}"
+      DOCUMENT_MAX_UPLOAD_SIZE_MB: "${DOCUMENT_MAX_UPLOAD_SIZE_MB:-25}"
+      DOCUMENT_MAX_PAGES: "${DOCUMENT_MAX_PAGES:-500}"
+      DOCUMENT_MAX_EXTRACTED_CHARS: "${DOCUMENT_MAX_EXTRACTED_CHARS:-5000000}"
+      DOCUMENT_CHUNK_SIZE: "${DOCUMENT_CHUNK_SIZE:-1400}"
+      DOCUMENT_CHUNK_OVERLAP: "${DOCUMENT_CHUNK_OVERLAP:-180}"
+      S3_ENDPOINT_URL: "${S3_ENDPOINT_URL:-}"
+      S3_BUCKET: "${S3_BUCKET:-}"
+      S3_ACCESS_KEY_ID: "${S3_ACCESS_KEY_ID:-}"
+      S3_SECRET_ACCESS_KEY: "${S3_SECRET_ACCESS_KEY:-}"
+      S3_REGION: "${S3_REGION:-}"
+      CORS_ORIGINS: "${CORS_ORIGINS:-http://localhost:5173}"
+      MAX_UPLOAD_SIZE_MB: "${MAX_UPLOAD_SIZE_MB:-25}"
+      GEMINI_API_KEY: "${GEMINI_API_KEY:-}"
+      GEMINI_MODEL: "${GEMINI_MODEL:-gemini-3.8-flash}"
+      GEMINI_EMBEDDING_MODEL: "${GEMINI_EMBEDDING_MODEL:-gemini-embedding-2}"
+      GEMINI_EMBEDDING_DIMENSION: "${GEMINI_EMBEDDING_DIMENSION:-768}"
+      GEMINI_EMBEDDING_BATCH_SIZE: "${GEMINI_EMBEDDING_BATCH_SIZE:-32}"
+      GEMINI_MAX_RETRIES: "${GEMINI_MAX_RETRIES:-3}"
+      GEMINI_TIMEOUT_SECONDS: "${GEMINI_TIMEOUT_SECONDS:-45}"
+      RETRIEVAL_MIN_SIMILARITY: "${RETRIEVAL_MIN_SIMILARITY:-0.25}"
+      JWT_SECRET_KEY: "${JWT_SECRET_KEY:-}"
+      JWT_ALGORITHM: "${JWT_ALGORITHM:-HS256}"
+      JWT_ISSUER: "${JWT_ISSUER:-documind-api}"
+      ACCESS_TOKEN_EXPIRE_MINUTES: "${ACCESS_TOKEN_EXPIRE_MINUTES:-60}"
+      AUTH_COOKIE_NAME: "${AUTH_COOKIE_NAME:-documind_access}"
+      CSRF_COOKIE_NAME: "${CSRF_COOKIE_NAME:-documind_csrf}"
+      AUTH_COOKIE_SECURE: "${AUTH_COOKIE_SECURE:-false}"
+      AUTH_COOKIE_SAMESITE: "${AUTH_COOKIE_SAMESITE:-lax}"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - documind_storage:/app/storage
+
+volumes:
+  documind_storage:
+  documind_postgres:
+

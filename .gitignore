@@ -1,0 +1,80 @@
+# ============================================================
+# DocuMind AI — .gitignore
+# ============================================================
+
+# ----- Secrets & environment --------------------------------
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+# Keep the template
+!.env.example
+!backend/.env.example
+!frontend/.env.example
+
+# ----- Python -----------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+*.egg
+*.whl
+
+# Testing & coverage
+.pytest_cache/
+.pytest-tmp/
+.pytest-run-temp/
+htmlcov/
+.coverage
+coverage.xml
+*.cover
+
+# Mypy / type checkers
+.mypy_cache/
+.dmypy.json
+
+# ----- Node / Frontend --------------------------------------
+frontend/node_modules/
+frontend/dist/
+frontend/.cache/
+node_modules/
+
+# ----- Storage (runtime data — not for git) -----------------
+storage/
+backend/storage/
+
+# ----- Databases --------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+
+# ----- Docker -----------------------------------------------
+# Keep docker-compose.yml and Dockerfile; ignore override files
+docker-compose.override.yml
+
+# ----- OS & editors -----------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ----- Logs -------------------------------------------------
+*.log
+logs/
